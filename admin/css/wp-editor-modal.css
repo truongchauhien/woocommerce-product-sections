@@ -1,0 +1,24 @@
+.wps-wp-editor-modal {
+    display: none;
+    position: fixed;
+    z-index: 160000;
+    top: 30px;
+    left: 30px;
+    bottom: 30px;
+    right: 30px;
+    background-color: orangered;
+}
+
+.wps-wp-editor-modal-content {
+
+}
+
+.wps-wp-editor-modal-header {
+    min-height: 5em;
+}
+
+
+.wps-wp-editor-modal-close {
+    float: right;
+    font-size: large;
+}
