@@ -142,8 +142,40 @@ function wps_display_product_section_metabox($post, $args) {
     }
 }
 
+function wps_find_array_by_nested_keys($keys, $array) {
+    $current_level = $array;
+    foreach ($keys as $key) {
+        if (!array_key_exists($key, $current_level)) {
+            return NULL;
+        }
+
+        $current_level = $current_level[$key];
+    }
+    return $current_level;
+}
+
 function wps_display_product_table_section($post, $id, $section) {
     echo '<table class="wps-table-section">';
+    echo '<thead>';
+    echo '  <tr>';
+    echo '      <td></td>';
+    printf('      <td>%s</td>', __('Left header', 'woocommerce-product-sections'));
+    printf('      <td>%s</td>', __('Right header', 'woocommerce-product-sections'));
+    echo '  </tr>';
+    echo '  <tr>';
+    echo '      <td></td>';
+    echo '      <td>';
+    printf('          <input type="text" value="%s" name="wps-table-left-header[%s]">',
+        esc_attr(wps_find_array_by_nested_keys(['meta', 'left-header'], $section)),
+        esc_attr($id));
+    echo '      </td>';
+    echo '      <td>';
+    printf('          <input type="text" value="%s" name="wps-table-right-header[%s]">',
+        esc_attr(wps_find_array_by_nested_keys(['meta', 'right-header'], $section)),
+        esc_attr($id));
+    echo '      </td>';
+    echo '  </tr>';
+    echo '</thead>';
     echo '<tbody class="wps-table-entries">';
     printf('  <tr class="wps-table-entry-template" data-id="%s">', $id);
     echo '      <td>';
@@ -262,6 +294,7 @@ add_action('save_post', 'wps_save_product_sections', 10, 3);
 function wps_save_product_sections($post_id, $post, $update) {
     $meta = get_post_meta($post_id, 'wps_product_sections', true);
     $sections = json_decode($meta, true);
+    
     if (array_key_exists('wps-table-entry-name', $_POST) &&
         array_key_exists('wps-table-entry-value', $_POST)) {   
             $ids = array_keys($_POST['wps-table-entry-name']);
@@ -281,6 +314,10 @@ function wps_save_product_sections($post_id, $post, $update) {
                     ];
                 }
                 $sections[$id]['entries'] = $entries;
+                $sections[$id]['meta'] = [
+                    'left-header' => $_POST['wps-table-left-header'][$id],
+                    'right-header' => $_POST['wps-table-right-header'][$id]
+                ];
             }
     }
 
@@ -299,7 +336,7 @@ function wps_save_product_sections($post_id, $post, $update) {
             foreach ($titles as $index => $title) {
                 $entries[] = [
                     'title' => $title,
-                    'content' => $contents[$index]
+                    'content' => base64_encode($contents[$index])
                 ];
             }
             $sections[$id]['entries'] = $entries;
@@ -324,7 +361,90 @@ function wps_save_product_sections($post_id, $post, $update) {
         json_encode($sections, JSON_UNESCAPED_UNICODE));
 }
 
-// wp_editor('', 'wps-editor');
+add_filter('woocommerce_product_tabs', 'wps_display_product_section_tabs');
+function wps_display_product_section_tabs($tabs) {
+    global $post;
+    $meta = get_post_meta($post->ID, 'wps_product_sections', true);
+    $sections = json_decode($meta, true);
+
+    foreach ($sections as $id => $section) {
+        $tabs[$id] = array(
+            'title' => $section['title'],
+            'priority' => 30,
+            'callback' => 'wps_display_product_section',
+            'section' => $section
+        );
+    }
+
+    return $tabs;
+}
+
+function wps_display_product_section($id, $tab) {
+    $section = $tab['section'];
+    switch ($section['type']) {
+        case 'table':
+            wps_display_product_table_section_on_frontend($section);
+            break;
+        case 'accordion':
+            wps_display_product_accordion_section_on_frontend($section);
+            break;
+        case 'text':
+            wps_display_product_text_section_on_frontend($section);
+            break;
+        default:
+            break;
+    }
+}
+
+function wps_display_product_table_section_on_frontend($section) {
+    echo '<table class="wps-table-section">';
+    echo '    <thead>';
+    echo '        <tr>';
+    echo '            <td>';
+    echo '                ' . esc_html(wps_find_array_by_nested_keys(['meta', 'left-header'], $section));
+    echo '            </td>';
+    echo '            <td>';
+    echo '                ' . esc_html(wps_find_array_by_nested_keys(['meta', 'right-header'], $section));
+    echo '            </td>';
+    echo '        </tr>';
+    echo '    </thead>';
+    echo '    <tbody>';
+    foreach ($section['entries'] as $entry) {
+        $name = esc_html($entry['name']);
+        $value = esc_html($entry['value']);
+        echo '        <tr>';
+        printf('          <td>%s</td>', esc_html($name));
+        printf('          <td>%s</td>', esc_html($value));
+        echo '        </tr>';
+    }
+    echo '    </tbody>';
+    echo '</table>';
+}
+
+function wps_display_product_accordion_section_on_frontend($section) {
+    $entries = $section['entries'];
+    echo '<div class="wps-accordion-section">';
+    foreach ($entries as $index => $entry) {
+        $content = base64_decode($entry['content']);
+        echo '  <div class="wps-accordion-entry">';
+        printf('    <button class="wps-accordion-entry-trigger">%s</button>', esc_html($entry['title']));
+        echo '      <div class="wps-accordion-entry-content">';
+        echo            $content;
+        echo '      </div>';
+        echo '  </div>';
+    }
+    printf('<button class="button wps-accordion-entry-add">%s</button>', __('Add', 'woocommerce-product-sections'));
+    echo '</div>';
+}
+
+function wps_display_product_text_section_on_frontend($section) {
+    $content = base64_decode($section['content']);
+    printf('<div class="wps-text-section">');
+    echo '      <div class="wps-text-section-content">';
+    echo            $content;
+    echo '      </div>';
+    echo '</div>';
+}
 
 add_action('admin_enqueue_scripts', 'wps_add_admin_scripts');
 function wps_add_admin_scripts() {
