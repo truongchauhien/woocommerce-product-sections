@@ -17,3 +17,7 @@ jQuery('.wps-table-entry-delete').on('click', function() {
     jQuery(this).closest('.wps-table-entry').remove();
     return false;
 });
+
+jQuery('.wps-table-entries').sortable({
+    cursor: 'move'
+});

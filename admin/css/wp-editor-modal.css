@@ -1,24 +1,48 @@
 .wps-wp-editor-modal {
     display: none;
     position: fixed;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
     z-index: 160000;
-    top: 30px;
-    left: 30px;
-    bottom: 30px;
-    right: 30px;
-    background-color: orangered;
+    background-color: rgba(0, 0, 0, 70%);
+    overflow: auto;
 }
 
 .wps-wp-editor-modal-content {
-
+    margin: 30px 30px 30px 30px;
 }
 
 .wps-wp-editor-modal-header {
-    min-height: 5em;
+    min-height: 2em;
 }
 
+.wps-wp-editor-modal-footer {
+    margin-top: 1.5em;
+}
 
 .wps-wp-editor-modal-close {
     float: right;
-    font-size: large;
+    font-size: xx-large;
+    cursor: pointer;
+    color: red;
+}
+
+.wps-wp-editor-modal-button {
+    background: #f6f7f7;
+    min-height: 30px;
+    padding: 0 10px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.wps-wp-editor-modal-ok {
+    color: #2271b1;
+    border-color: #2271b1;
+}
+
+.wps-wp-editor-modal-cancel {
+    color: #f84221;
+    border-color: #f84221;
 }

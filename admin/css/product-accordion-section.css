@@ -2,19 +2,37 @@
     display: none;
 }
 
+.wps-accordion-entry-flex {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.wps-accordion-entry-drag {
+    cursor: move;
+    font-size: 1.75em;
+    margin-right: 0.25em;
+}
+
+.wps-accordion-entry-flex-item-1 {
+    align-self: center;
+    justify-content: center;
+}
+
+.wps-accordion-entry-flex-item-2 {
+    flex-grow: 1;
+    border: solid;
+}
+
 .wps-accordion-entry-trigger {
     background-color: #EEE;
     cursor: pointer;
     width: 100%;
-    padding: 0.75em;
+    padding: 0.5em;
     border: none;
     outline: none;
-    font-size: large;
+    font-size: 1.5em;
     text-align: left;
-}
-
-.wps-accordion-entry-body {
-    display: none;
+    min-height: 2em;
 }
 
 .wps-accordion-entry-trigger-active, .wps-accordion-entry-trigger:hover {
@@ -22,6 +40,35 @@
     transition: 0.7s;
 }
 
+.wps-accordion-entry-body {
+    display: none;
+    margin: 0.5em;
+}
+
 .wps-accordion-entry-body > input:nth-child(1) {
     width: 100%;
+}
+
+.wps-accordion-entry-body .wps-accordion-entry-content-edit {
+    margin-top: 0.5em;
+}
+
+.wps-accordion-entry-body .wps-accordion-entry-delete {
+    margin-top: 0.5em;
+}
+
+.wps-accordion-entry-content {
+    margin-top: 0.5em;
+    min-height: 5em;
+    background-color: #EEE;
+    padding: 0.5em;
+    font-size: 1.5em;
+}
+
+.wps-accordion-entry-add {
+    margin-top: 0.5em !important;
+}
+
+.wps-accordion-buttons {
+    margin-left: 2.25em;
 }

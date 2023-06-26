@@ -1,0 +1,8 @@
+.wps-text-section-content {
+    min-height: 5em;
+    background-color: #EEE;
+}
+
+.wps-text-section-edit {
+    margin-top: 0.5em !important;
+}

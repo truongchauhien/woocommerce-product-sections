@@ -1,4 +1,4 @@
-jQuery('.wps-text-section-edit').on('click', function(event) {
+jQuery('.wps-text-section-edit,.wps-text-section-content').on('click', function(event) {
     const container = jQuery(this).closest('.wps-text-section')
     const contentInput = container.find('input').first();
     const contentViewer = container.find('.wps-text-section-content').first();

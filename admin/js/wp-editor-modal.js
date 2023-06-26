@@ -6,10 +6,17 @@ function wps_openModal(content, okCallBack, cancelCallback, closeCallback) {
     const closeButton = jQuery('.wps-wp-editor-modal-close').first();
     
     wp.editor.initialize('wps-wp-editor', {
-        tinymce: true
+        tinymce: {
+            wpautop:true,
+            height: 480,
+            auto_focus: true
+        },
+        quicktags: true,
+        mediaButtons: true,
     });
 
-    tinymce.get('wps-wp-editor').setContent(content);
+    const editor = tinymce.get('wps-wp-editor');
+    editor.setContent(content);
 
     function closeModal() {
         modal.css('display', 'none');
@@ -35,10 +42,12 @@ function wps_openModal(content, okCallBack, cancelCallback, closeCallback) {
         closeModal();
     });
 
+    editor.on('keydown', function(event) {
+        if (event.keyCode === 27) {
+            closeCallback?.();
+            closeModal();
+        }
+    });
+
     modal.css('display', 'block');
 }
-
-jQuery(function() {
-    console.log('-_-');
-
-});

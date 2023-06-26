@@ -27,9 +27,9 @@ function wps_add_product_section_editor() {
 }
 
 function wps_display_product_section_list() {
-    printf('<button class="button wps-product-section-add">%s</button>', __('Add a section', 'woocommerce-product-sections'));
     echo '<div class="wps-product-sections">';
     echo '  <div class="wps-product-section-template">';
+    echo '      <span class="wps-product-section-drag">↕️</span>';
     echo '      <input type="hidden">';
     echo '      <input type="text">';
     echo '      <select required>';
@@ -37,7 +37,7 @@ function wps_display_product_section_list() {
     printf('        <option value="accordion">%s</option>', __('Accordion', 'woocommerce-product-sections'));
     printf('        <option value="text">%s</option>', __('Text', 'woocommerce-product-sections'));
     echo '      </select>';
-    printf('    <button class="button wps-product-section">%s</button>', __('Delete', 'woocommerce-product-sections'));
+    printf('    <button class="button wps-product-section-delete">%s</button>', __('Delete', 'woocommerce-product-sections'));
     echo '  </div>';    
     global $post;
     $meta = get_post_meta($post->ID, 'wps_product_sections', true);
@@ -45,6 +45,7 @@ function wps_display_product_section_list() {
         $sections = json_decode($meta, true);
         foreach ($sections as $id => $section) {
             echo '  <div class="wps-product-section">';
+            echo '        <span class="wps-product-section-drag">↕️</span>';
             printf('      <input type="hidden" name="wps-section-id[]" value="%s">', esc_attr($id));
             printf('      <input type="text" name="wps-section-title[]" value="%s">', esc_attr($section['title']));
             printf('      <select name="wps-section-type[]">');
@@ -63,45 +64,13 @@ function wps_display_product_section_list() {
         }
     }
     echo '</div>';
+    printf('<button class="button wps-product-section-add">%s</button>', __('Add a section', 'woocommerce-product-sections'));
     submit_button();
 }
 
 add_action('save_post', 'wps_save_product_section_list');
 function wps_save_product_section_list($post_id) {
-    if (array_key_exists('wps-section-id', $_POST) &&
-        array_key_exists('wps-section-title', $_POST) &&
-        array_key_exists('wps-section-type', $_POST)) {
-        $ids = $_POST['wps-section-id'];
-        $titles = $_POST['wps-section-title'];
-        $types = $_POST['wps-section-type'];
-
-        $meta = get_post_meta($post_id, 'wps_product_sections', true);
-        $current_sections = json_decode($meta, true);
-        if (empty($current_sections)) {
-            $current_sections = [];
-        }
-
-        $sections = array();
-        foreach ($ids as $index => $id) {
-            if (array_key_exists($id, $current_sections)) {
-                $sections[$id] = $current_sections[$id];
-            } else {
-                if (empty($id)) {
-                    $id = wp_generate_uuid4();
-                }                
-                $sections[$id] = [];
-            }
-
-            $sections[$id]['title'] = $titles[$index];
-            $sections[$id]['type'] = $types[$index];
-        }
-
-        update_post_meta(
-            $post_id,
-            'wps_product_sections',
-            json_encode($sections, JSON_UNESCAPED_UNICODE)
-        );
-    }
+    
 }
 
 add_action('add_meta_boxes', 'wps_add_product_section_metaboxes', 10, 2);
@@ -111,7 +80,9 @@ function wps_add_product_section_metaboxes($post_type, $post) {
     foreach ($sections as $id => $section) {
         add_meta_box(
             sprintf('wps_%s', $id),
-            $section['title'],
+            ($section['title'] === null || trim($section['title']) === '') ?
+                __('Untitled Section', 'woocommerce-product-sections')
+                    : $section['title'],
             'wps_display_product_section_metabox',
             'product',
             'advanced',
@@ -158,22 +129,25 @@ function wps_display_product_table_section($post, $id, $section) {
     echo '<table class="wps-table-section">';
     echo '<thead>';
     echo '  <tr>';
-    echo '      <td></td>';
-    printf('      <td>%s</td>', __('Left header', 'woocommerce-product-sections'));
-    printf('      <td>%s</td>', __('Right header', 'woocommerce-product-sections'));
-    echo '  </tr>';
-    echo '  <tr>';
-    echo '      <td></td>';
-    echo '      <td>';
-    printf('          <input type="text" value="%s" name="wps-table-left-header[%s]">',
-        esc_attr(wps_find_array_by_nested_keys(['meta', 'left-header'], $section)),
-        esc_attr($id));
-    echo '      </td>';
-    echo '      <td>';
-    printf('          <input type="text" value="%s" name="wps-table-right-header[%s]">',
-        esc_attr(wps_find_array_by_nested_keys(['meta', 'right-header'], $section)),
-        esc_attr($id));
-    echo '      </td>';
+    echo '        <td></td>';
+    printf('      <td>
+                    <label for="%s">%s</label>
+                    <input id ="%s" type="text" value="%s" name="wps-table-left-header[%s]">
+                  </td>',
+                        "wps-table-left-header-{$id}",
+                        __('Left header', 'woocommerce-product-sections'),
+                        "wps-table-left-header-{$id}",
+                        esc_attr(wps_find_array_by_nested_keys(['meta', 'left-header'], $section)),
+                        esc_attr($id));
+    printf('      <td>
+                    <label for="%s">%s</label>
+                    <input id="%s" type="text" value="%s" name="wps-table-right-header[%s]">
+                  </td>',
+                        "wps-table-right-header-{$id}",
+                        __('Right header', 'woocommerce-product-sections'),
+                        "wps-table-right-header-{$id}",
+                        esc_attr(wps_find_array_by_nested_keys(['meta', 'right-header'], $section)),
+                        esc_attr($id));
     echo '  </tr>';
     echo '</thead>';
     echo '<tbody class="wps-table-entries">';
@@ -217,6 +191,7 @@ function wps_display_product_table_section($post, $id, $section) {
     echo '  </td>';
     echo '  <td>';
     printf('    <button class="button wps-table-entry-add">%s</button>', esc_html(__('Add an entry', 'woocommerce-product-sections')));
+    submit_button();
     echo '  </td>';
     echo '  <td>';
     echo '  </td>';
@@ -239,8 +214,8 @@ function wps_add_wp_editor_modal() {
     echo '          <textarea id="wps-wp-editor"></textarea>';
     echo '      </div>';
     echo '      <div class="wps-wp-editor-modal-footer">';
-    printf('          <button class="button wps-wp-editor-modal-ok">%s</button>', __('OK', 'woocommerce-product-sections'));
-    printf('          <button class="button wps-wp-editor-modal-cancel">%s</button>', __('Cancel', 'woocommerce-product-sections'));
+    printf('          <button class="wps-wp-editor-modal-button wps-wp-editor-modal-ok">%s</button>', __('OK', 'woocommerce-product-sections'));
+    printf('          <button class="wps-wp-editor-modal-button wps-wp-editor-modal-cancel">%s</button>', __('Cancel', 'woocommerce-product-sections'));
     echo '      </div>';
     echo '  </div>';
     echo '</div>';
@@ -248,34 +223,53 @@ function wps_add_wp_editor_modal() {
 
 function wps_display_product_accordion_section($post, $id, $section) {
     echo '<div class="wps-accordion-section">';
-    printf('<div class="wps-accordion-entry-template" data-id="%s">', esc_attr($id));
-    echo '      <button class="wps-accordion-entry-trigger"></button>';
-    echo '      <div class="wps-accordion-entry-body">';
-    echo '          <input type="text" value="">';
-    echo '          <input type="hidden" value="">';
-    echo '          <div class="wps-accordion-entry-content">';
+    echo '  <div class="wps-accordion-entries">';
+    printf('    <div class="wps-accordion-entry wps-accordion-entry-template" data-id="%s">', esc_attr($id));
+    echo '          <div class="wps-accordion-entry-flex">';
+    echo '              <div class="wps-accordion-entry-flex-item-1">';
+    echo '                  <span class="wps-accordion-entry-drag">↕️</span>';
+    echo '              </div>';
+    echo '              <div class="wps-accordion-entry-flex-item-2">';
+    echo '                  <button class="wps-accordion-entry-trigger"></button>';
+    echo '                  <div class="wps-accordion-entry-body">';
+    echo '                      <input type="text" value="">';
+    echo '                      <input type="hidden" value="">';
+    echo '                      <div class="wps-accordion-entry-content">';
+    echo '                      </div>';
+    printf('                    <button class="button wps-accordion-entry-content-edit">%s</button>', __('Edit', 'woocommerce-product-sections'));
+    printf('                    <button class="button wps-accordion-entry-delete">%s</button>', __('Delete', 'woocommerce-product-sections'));
+    echo '                  </div>';
+    echo '              </div>';
     echo '          </div>';
-    printf('        <button class="button wps-accordion-entry-content-edit">%s</button>', __('Edit', 'woocommerce-product-sections'));
-    printf('        <button class="button wps-accordion-entry-delete">%s</button>', __('Delete', 'woocommerce-product-sections'));
     echo '      </div>';
-    echo '  </div>';
     $entries = $section['entries'];
     foreach ($entries as $index => $entry) {
         $content = base64_decode($entry['content']);
         echo '  <div class="wps-accordion-entry">';
-        printf('    <button class="wps-accordion-entry-trigger">%s</button>', esc_html($entry['title']));
-        echo '      <div class="wps-accordion-entry-body">';
-        printf('        <input type="text" name="wps-accordion-entry-title[%s][]" value="%s">', esc_attr($id), esc_attr($entry['title']));
-        printf('        <input type="hidden" name="wps-accordion-entry-content[%s][]" value="%s">', esc_attr($id), esc_attr($content));
-        echo '          <div class="wps-accordion-entry-content">';
-        echo                $content;
+        echo '      <div class="wps-accordion-entry-flex">';
+        echo '          <div class="wps-accordion-entry-flex-item-1">';
+        echo '              <span class="wps-accordion-entry-drag">↕️</span>';
         echo '          </div>';
-        printf('        <button class="button wps-accordion-entry-content-edit">%s</button>', __('Edit', 'woocommerce-product-sections'));
-        printf('        <button class="button wps-accordion-entry-delete">%s</button>', __('Delete', 'woocommerce-product-sections'));
+        echo '          <div class="wps-accordion-entry-flex-item-2">';
+        printf('            <button class="wps-accordion-entry-trigger">%s</button>', esc_html($entry['title']));
+        echo '              <div class="wps-accordion-entry-body">';
+        printf('                <input type="text" name="wps-accordion-entry-title[%s][]" value="%s">', esc_attr($id), esc_attr($entry['title']));
+        printf('                <input type="hidden" name="wps-accordion-entry-content[%s][]" value="%s">', esc_attr($id), esc_attr($content));
+        echo '                  <div class="wps-accordion-entry-content">';
+        echo                        $content;
+        echo '                  </div>';
+        printf('                <button class="button-secondary wps-accordion-entry-content-edit">%s</button>', __('Edit', 'woocommerce-product-sections'));
+        printf('                <button class="button-secondary delete wps-accordion-entry-delete">%s</button>', __('Delete', 'woocommerce-product-sections'));
+        echo '              </div>';
+        echo '          </div>';
         echo '      </div>';
         echo '  </div>';
     }
-    printf('<button class="button wps-accordion-entry-add">%s</button>', __('Add', 'woocommerce-product-sections'));
+    echo '  </div>';
+    echo '  <div class="wps-accordion-buttons">';
+    printf('    <button class="button wps-accordion-entry-add">%s</button>', __('Add an entry', 'woocommerce-product-sections'));
+    submit_button();
+    echo '  </div>';
     echo '</div>';
 }
 
@@ -287,16 +281,49 @@ function wps_display_product_text_section($post, $id, $section) {
     echo            $content;
     echo '      </div>';
     printf('    <button class="button wps-text-section-edit">%s</button>', __('Edit', 'woocommerce-product-sections'));
+    submit_button();
     echo '</div>';
 }
 
 add_action('save_post', 'wps_save_product_sections', 10, 3);
 function wps_save_product_sections($post_id, $post, $update) {
-    $meta = get_post_meta($post_id, 'wps_product_sections', true);
-    $sections = json_decode($meta, true);
+    if (wp_is_post_autosave($post_id)) {
+        return;
+    }
+
+    $sections = [];
+
+    if (array_key_exists('wps-section-id', $_POST) &&
+        array_key_exists('wps-section-title', $_POST) &&
+        array_key_exists('wps-section-type', $_POST)) {
+        $ids = $_POST['wps-section-id'];
+        $titles = $_POST['wps-section-title'];
+        $types = $_POST['wps-section-type'];
+
+        $meta = get_post_meta($post_id, 'wps_product_sections', true);
+        $current_sections = json_decode($meta, true);
+
+        if (empty($current_sections)) {
+            $current_sections = [];
+        }
+
+        foreach ($ids as $index => $id) {
+            if (array_key_exists($id, $current_sections)) {
+                $sections[$id] = $current_sections[$id];
+            } else {
+                if (empty($id)) {
+                    $id = wp_generate_uuid4();
+                }                
+                $sections[$id] = [];
+            }
+
+            $sections[$id]['title'] = $titles[$index];
+            $sections[$id]['type'] = $types[$index];
+        }
+    }
     
     if (array_key_exists('wps-table-entry-name', $_POST) &&
-        array_key_exists('wps-table-entry-value', $_POST)) {   
+        array_key_exists('wps-table-entry-value', $_POST)) {
             $ids = array_keys($_POST['wps-table-entry-name']);
             foreach ($ids as $id) {
                 if (!array_key_exists($id, $sections)) {
@@ -314,6 +341,14 @@ function wps_save_product_sections($post_id, $post, $update) {
                     ];
                 }
                 $sections[$id]['entries'] = $entries;
+            }
+    }
+
+    if (array_key_exists('wps-table-left-header', $_POST) &&
+        array_key_exists('wps-table-right-header', $_POST)) {
+            $ids = array_keys($_POST['wps-table-left-header']);
+
+            foreach ($ids as $id) {
                 $sections[$id]['meta'] = [
                     'left-header' => $_POST['wps-table-left-header'][$id],
                     'right-header' => $_POST['wps-table-right-header'][$id]
@@ -336,7 +371,7 @@ function wps_save_product_sections($post_id, $post, $update) {
             foreach ($titles as $index => $title) {
                 $entries[] = [
                     'title' => $title,
-                    'content' => base64_encode($contents[$index])
+                    'content' => base64_encode(stripslashes($contents[$index]))
                 ];
             }
             $sections[$id]['entries'] = $entries;
@@ -351,14 +386,14 @@ function wps_save_product_sections($post_id, $post, $update) {
             }
 
             $content = $_POST['wps-text-section-content'][$id];
-            $sections[$id]['content'] = base64_encode($content);
+            $sections[$id]['content'] = base64_encode(stripslashes($content));
         }
     }
 
     update_post_meta(
         $post_id,
         'wps_product_sections',
-        json_encode($sections, JSON_UNESCAPED_UNICODE));
+        json_encode($sections, JSON_UNESCAPED_UNICODE | JSON_HEX_APOS));
 }
 
 add_filter('woocommerce_product_tabs', 'wps_display_product_section_tabs');
@@ -433,7 +468,6 @@ function wps_display_product_accordion_section_on_frontend($section) {
         echo '      </div>';
         echo '  </div>';
     }
-    printf('<button class="button wps-accordion-entry-add">%s</button>', __('Add', 'woocommerce-product-sections'));
     echo '</div>';
 }
 

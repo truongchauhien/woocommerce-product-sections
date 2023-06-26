@@ -1,7 +1,17 @@
+.wps-product-section {
+    margin-top: 0.25em;
+}
+
 .wps-product-sections .wps-product-section-template {
     display: none;
 }
 
 .wps-product-section-add {
-    margin-bottom: 2em !important;
+    margin-top: 0.5em !important;
+}
+
+.wps-product-section-drag {
+    vertical-align: middle;
+    cursor: move;
+    font-size: 1.75em;
 }

@@ -12,3 +12,8 @@ jQuery('.wps-product-section-delete').on('click', function() {
     jQuery(this).closest('.wps-product-section').remove();
     return false;
 });
+
+jQuery('.wps-product-sections')
+.sortable({
+    cursor: 'move'
+});
