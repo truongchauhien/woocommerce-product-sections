@@ -404,7 +404,8 @@ function wps_display_product_section_tabs($tabs) {
 
     foreach ($sections as $id => $section) {
         $tabs[$id] = array(
-            'title' => $section['title'],
+            'title' => ($section['title'] === null || trim($section['title']) === '') ?
+                    'Untitled' : $section['title'],
             'priority' => 30,
             'callback' => 'wps_display_product_section',
             'section' => $section
@@ -482,22 +483,35 @@ function wps_display_product_text_section_on_frontend($section) {
 
 add_action('admin_enqueue_scripts', 'wps_add_admin_scripts');
 function wps_add_admin_scripts() {
-    if (is_admin()) {
-        wp_enqueue_script('wps_product_sections_js', plugin_dir_url(__FILE__) . '/admin/js/product-sections.js', array('jquery'), false, true);
-        wp_enqueue_style('wps_product_sections_css', plugin_dir_url(__FILE__) . '/admin/css/product-sections.css');
-        
-        wp_enqueue_script('wps_product_table_section_js', plugin_dir_url(__FILE__) . '/admin/js/product-table-section.js', array('jquery'), false, true);
-        wp_enqueue_style('wps_product_table_section_css', plugin_dir_url(__FILE__) . '/admin/css/product-table-section.css');
-
-        wp_enqueue_script('wps_product_accordion_section_js', plugin_dir_url(__FILE__) . '/admin/js/product-accordion-section.js', array('jquery'), false, true);
-        wp_enqueue_style('wps_product_accordion_section_css', plugin_dir_url(__FILE__) . '/admin/css/product-accordion-section.css');
-
-        wp_enqueue_script('wps_product_text_section_js', plugin_dir_url(__FILE__) . '/admin/js/product-text-section.js', array('jquery', 'wps_wp_editor_modal_js'), false, true);
-        wp_enqueue_style('wps_product_text_section_css', plugin_dir_url(__FILE__) . '/admin/css/product-text-section.css');
-
-        wp_enqueue_script('wps_wp_editor_modal_js', plugin_dir_url(__FILE__) . '/admin/js/wp-editor-modal.js', array('jquery'), false, true);
-        wp_enqueue_style('wps_wp_editor_modal_css', plugin_dir_url(__FILE__) . '/admin/css/wp-editor-modal.css');
-
-        wp_enqueue_editor();
+    if (!is_admin()) {
+        return;
     }
+    
+    wp_enqueue_script('wps_product_sections_js', plugin_dir_url(__FILE__) . '/admin/js/product-sections.js', array('jquery'), false, true);
+    wp_enqueue_style('wps_product_sections_css', plugin_dir_url(__FILE__) . '/admin/css/product-sections.css');
+    
+    wp_enqueue_script('wps_product_table_section_js', plugin_dir_url(__FILE__) . '/admin/js/product-table-section.js', array('jquery'), false, true);
+    wp_enqueue_style('wps_product_table_section_css', plugin_dir_url(__FILE__) . '/admin/css/product-table-section.css');
+
+    wp_enqueue_script('wps_product_accordion_section_js', plugin_dir_url(__FILE__) . '/admin/js/product-accordion-section.js', array('jquery'), false, true);
+    wp_enqueue_style('wps_product_accordion_section_css', plugin_dir_url(__FILE__) . '/admin/css/product-accordion-section.css');
+
+    wp_enqueue_script('wps_product_text_section_js', plugin_dir_url(__FILE__) . '/admin/js/product-text-section.js', array('jquery', 'wps_wp_editor_modal_js'), false, true);
+    wp_enqueue_style('wps_product_text_section_css', plugin_dir_url(__FILE__) . '/admin/css/product-text-section.css');
+
+    wp_enqueue_script('wps_wp_editor_modal_js', plugin_dir_url(__FILE__) . '/admin/js/wp-editor-modal.js', array('jquery'), false, true);
+    wp_enqueue_style('wps_wp_editor_modal_css', plugin_dir_url(__FILE__) . '/admin/css/wp-editor-modal.css');
+
+    wp_enqueue_editor();
+}
+
+add_action('wp_enqueue_scripts', 'wps_add_frontend_scripts');
+function wps_add_frontend_scripts() {
+    if (is_admin()) {
+        return;
+    }
+
+    wp_enqueue_style('wps_product_table_section_css', plugin_dir_url(__FILE__) . '/public/css/product-table-section.css');
+    wp_enqueue_style('wps_product_accordion_section_css', plugin_dir_url(__FILE__) . '/public/css/product-accordion-section.css');
+    wp_enqueue_script('wps_product_accordion_section_js', plugin_dir_url(__FILE__) . '/public/js/product-accordion-section.js', array('jquery'), false, true);
 }

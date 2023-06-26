@@ -1,0 +1,22 @@
+.wps-accordion-entry-content {
+    display: none;
+}
+
+.wps-accordion-entry-trigger {
+    min-width: 48em;
+    background-color: #EEE;
+    color: black;
+    text-align: left;
+}
+
+.wps-accordion-entry-trigger-active,
+.wps-accordion-entry-trigger:hover,
+.wps-accordion-entry-trigger:focus {
+    min-width: 48em;
+    background-color: #AAA;
+    color: black;
+}
+
+.wps-accordion-section .wps-accordion-entry:not(:first-child) {
+    margin-top: 0.5em;
+}

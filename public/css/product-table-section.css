@@ -1,0 +1,17 @@
+.wps-table-section {
+    max-width: 48rem;
+}
+
+.wps-table-section td {
+    border: 1px solid #333;
+    height: 2em; /* height is min-height in td element */
+}
+
+.wps-table-section thead {
+    background-color: #333;
+    color: #fff;
+}
+
+.wps-table-section tr:nth-child(even) {
+    background-color: #DDD;
+}
