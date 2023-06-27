@@ -69,8 +69,10 @@ function wps_display_product_section_list() {
         }
     }
     echo '</div>';
-    printf('<button class="button wps-product-section-add">%s</button>', esc_html(__('Add a section', 'woocommerce-product-sections')));
+    echo '<div class="wps-product-sections-buttons">';
+    printf('    <button class="button wps-product-section-add">%s</button>', esc_html(__('Add a section', 'woocommerce-product-sections')));
     submit_button();
+    echo '</div>';
 }
 
 add_action('save_post', 'wps_save_product_section_list');
