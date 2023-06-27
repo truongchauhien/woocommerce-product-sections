@@ -1,6 +1,7 @@
 <?php
 /*
  * Plugin Name: WooCommerce Product Sections
+ * Plugin URI: https://github.com/truongchauhien/woocommerce-product-sections
  * Text Domain: woocommerce-product-sections
  * Domain Path: /languages
  */
