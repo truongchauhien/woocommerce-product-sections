@@ -16,6 +16,11 @@ function wps_deactivate() {
 
 }
 
+add_action( 'init', 'wps_load_textdomain' );
+function wps_load_textdomain() {
+    load_plugin_textdomain('woocommerce-product-sections', false, dirname( plugin_basename( __FILE__ ) ) . '/languages'); 
+}
+
 add_action('add_meta_boxes', 'wps_add_product_section_editor');
 function wps_add_product_section_editor() {
     add_meta_box(

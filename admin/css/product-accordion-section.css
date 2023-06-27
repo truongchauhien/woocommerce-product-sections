@@ -23,6 +23,10 @@
     border: solid;
 }
 
+.wps-accordion-entries .wps-accordion-entry {
+    margin-top: 0.5em;
+}
+
 .wps-accordion-entry-trigger {
     background-color: #EEE;
     cursor: pointer;
