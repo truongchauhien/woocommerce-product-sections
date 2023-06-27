@@ -38,11 +38,11 @@ function wps_display_product_section_list() {
     echo '      <input type="hidden">';
     echo '      <input type="text">';
     echo '      <select required>';
-    printf('        <option value="table">%s</option>', __('Table', 'woocommerce-product-sections'));
-    printf('        <option value="accordion">%s</option>', __('Accordion', 'woocommerce-product-sections'));
-    printf('        <option value="text">%s</option>', __('Text', 'woocommerce-product-sections'));
+    printf('        <option value="table">%s</option>', esc_html(__('Table', 'woocommerce-product-sections')));
+    printf('        <option value="accordion">%s</option>', esc_html(__('Accordion', 'woocommerce-product-sections')));
+    printf('        <option value="text">%s</option>', esc_html(__('Text', 'woocommerce-product-sections')));
     echo '      </select>';
-    printf('    <button class="button wps-product-section-delete">%s</button>', __('Delete', 'woocommerce-product-sections'));
+    printf('    <button class="button wps-product-section-delete">%s</button>', esc_html(__('Delete', 'woocommerce-product-sections')));
     echo '  </div>';    
     global $post;
     $meta = get_post_meta($post->ID, 'wps_product_sections', true);
@@ -56,20 +56,20 @@ function wps_display_product_section_list() {
             printf('      <select name="wps-section-type[]">');
             printf('        <option value="table" %s>%s</option>', 
                                 selected($section['type'], 'table', false),
-                                __('Table', 'woocommerce-product-sections'));
+                                esc_html(__('Table', 'woocommerce-product-sections')));
             printf('        <option value="accordion" %s>%s</option>',
                                 selected($section['type'], 'accordion', false),
-                                __('Accordion', 'woocommerce-product-sections'));
+                                esc_html(__('Accordion', 'woocommerce-product-sections')));
             printf('        <option value="text" %s>%s</option>',
                                 selected($section['type'], 'text', false),
-                                __('Text', 'woocommerce-product-sections'));
+                                esc_html(__('Text', 'woocommerce-product-sections')));
             echo '      </select>';
-            printf('    <button class="button wps-product-section-delete">%s</button>', __('Delete', 'woocommerce-product-sections'));
+            printf('    <button class="button wps-product-section-delete">%s</button>', esc_html(__('Delete', 'woocommerce-product-sections')));
             echo '  </div>';
         }
     }
     echo '</div>';
-    printf('<button class="button wps-product-section-add">%s</button>', __('Add a section', 'woocommerce-product-sections'));
+    printf('<button class="button wps-product-section-add">%s</button>', esc_html(__('Add a section', 'woocommerce-product-sections')));
     submit_button();
 }
 
@@ -139,18 +139,18 @@ function wps_display_product_table_section($post, $id, $section) {
                     <label for="%s">%s</label>
                     <input id ="%s" type="text" value="%s" name="wps-table-left-header[%s]">
                   </td>',
-                        "wps-table-left-header-{$id}",
-                        __('Left header', 'woocommerce-product-sections'),
-                        "wps-table-left-header-{$id}",
+                        esc_attr("wps-table-left-header-{$id}"),
+                        esc_html(__('Left header', 'woocommerce-product-sections')),
+                        esc_attr("wps-table-left-header-{$id}"),
                         esc_attr(wps_find_array_by_nested_keys(['meta', 'left-header'], $section)),
                         esc_attr($id));
     printf('      <td>
                     <label for="%s">%s</label>
                     <input id="%s" type="text" value="%s" name="wps-table-right-header[%s]">
                   </td>',
-                        "wps-table-right-header-{$id}",
-                        __('Right header', 'woocommerce-product-sections'),
-                        "wps-table-right-header-{$id}",
+                        esc_attr("wps-table-right-header-{$id}"),
+                        esc_html(__('Right header', 'woocommerce-product-sections')),
+                        esc_attr("wps-table-right-header-{$id}"),
                         esc_attr(wps_find_array_by_nested_keys(['meta', 'right-header'], $section)),
                         esc_attr($id));
     echo '  </tr>';
@@ -219,8 +219,8 @@ function wps_add_wp_editor_modal() {
     echo '          <textarea id="wps-wp-editor"></textarea>';
     echo '      </div>';
     echo '      <div class="wps-wp-editor-modal-footer">';
-    printf('          <button class="wps-wp-editor-modal-button wps-wp-editor-modal-ok">%s</button>', __('OK', 'woocommerce-product-sections'));
-    printf('          <button class="wps-wp-editor-modal-button wps-wp-editor-modal-cancel">%s</button>', __('Cancel', 'woocommerce-product-sections'));
+    printf('          <button class="wps-wp-editor-modal-button wps-wp-editor-modal-ok">%s</button>', esc_html(__('OK', 'woocommerce-product-sections')));
+    printf('          <button class="wps-wp-editor-modal-button wps-wp-editor-modal-cancel">%s</button>', esc_html(__('Cancel', 'woocommerce-product-sections')));
     echo '      </div>';
     echo '  </div>';
     echo '</div>';
@@ -241,8 +241,8 @@ function wps_display_product_accordion_section($post, $id, $section) {
     echo '                      <input type="hidden" value="">';
     echo '                      <div class="wps-accordion-entry-content">';
     echo '                      </div>';
-    printf('                    <button class="button wps-accordion-entry-content-edit">%s</button>', __('Edit', 'woocommerce-product-sections'));
-    printf('                    <button class="button wps-accordion-entry-delete">%s</button>', __('Delete', 'woocommerce-product-sections'));
+    printf('                    <button class="button wps-accordion-entry-content-edit">%s</button>', esc_html(__('Edit', 'woocommerce-product-sections')));
+    printf('                    <button class="button wps-accordion-entry-delete">%s</button>', esc_html(__('Delete', 'woocommerce-product-sections')));
     echo '                  </div>';
     echo '              </div>';
     echo '          </div>';
@@ -263,8 +263,8 @@ function wps_display_product_accordion_section($post, $id, $section) {
         echo '                  <div class="wps-accordion-entry-content">';
         echo                        $content;
         echo '                  </div>';
-        printf('                <button class="button-secondary wps-accordion-entry-content-edit">%s</button>', __('Edit', 'woocommerce-product-sections'));
-        printf('                <button class="button-secondary delete wps-accordion-entry-delete">%s</button>', __('Delete', 'woocommerce-product-sections'));
+        printf('                <button class="button-secondary wps-accordion-entry-content-edit">%s</button>', esc_html(__('Edit', 'woocommerce-product-sections')));
+        printf('                <button class="button-secondary delete wps-accordion-entry-delete">%s</button>', esc_html(__('Delete', 'woocommerce-product-sections')));
         echo '              </div>';
         echo '          </div>';
         echo '      </div>';
@@ -272,7 +272,7 @@ function wps_display_product_accordion_section($post, $id, $section) {
     }
     echo '  </div>';
     echo '  <div class="wps-accordion-buttons">';
-    printf('    <button class="button wps-accordion-entry-add">%s</button>', __('Add an entry', 'woocommerce-product-sections'));
+    printf('    <button class="button wps-accordion-entry-add">%s</button>', esc_html(__('Add an entry', 'woocommerce-product-sections')));
     submit_button();
     echo '  </div>';
     echo '</div>';
@@ -285,7 +285,7 @@ function wps_display_product_text_section($post, $id, $section) {
     echo '      <div class="wps-text-section-content">';
     echo            $content;
     echo '      </div>';
-    printf('    <button class="button wps-text-section-edit">%s</button>', __('Edit', 'woocommerce-product-sections'));
+    printf('    <button class="button wps-text-section-edit">%s</button>', esc_html(__('Edit', 'woocommerce-product-sections')));
     submit_button();
     echo '</div>';
 }
